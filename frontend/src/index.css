@@ -43,117 +43,130 @@
 /* =========================================
    GLASSMORPHISM SYSTEM
    ========================================= */
-@layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+@utility glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
 
-  .glass-card {
-    background: rgba(10, 15, 40, 0.6);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
+@utility glass-card {
+  background: rgba(10, 15, 40, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
 
-  .glass-card-hover {
-    @apply glass-card transition-all duration-300;
-  }
+.glass-card-hover {
+  background: rgba(10, 15, 40, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
 
-  .glass-card-hover:hover {
-    background: rgba(15, 22, 55, 0.75);
-    border-color: rgba(0, 212, 255, 0.25);
-    box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 212, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    transform: translateY(-4px);
-  }
+.glass-card-hover:hover {
+  background: rgba(15, 22, 55, 0.75);
+  border-color: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 212, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px);
+}
 
-  .gradient-text {
-    background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+@utility gradient-text {
+  background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .gradient-text-alt {
-    background: linear-gradient(135deg, #a855f7 0%, #00d4ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+@utility gradient-text-alt {
+  background: linear-gradient(135deg, #a855f7 0%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .neon-border {
-    border: 1px solid rgba(0, 212, 255, 0.4) !important;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15), 0 0 40px rgba(0, 212, 255, 0.05), inset 0 0 15px rgba(0, 212, 255, 0.03);
-  }
+@utility neon-border {
+  border: 1px solid rgba(0, 212, 255, 0.4) !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.15), 0 0 40px rgba(0, 212, 255, 0.05), inset 0 0 15px rgba(0, 212, 255, 0.03);
+}
 
-  .neon-glow-cyan {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-  }
+@utility neon-glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
 
-  .neon-glow-purple {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-  }
+@utility neon-glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
 
-  .btn-primary {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.9), rgba(168, 85, 247, 0.9));
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3);
-    @apply text-white font-bold rounded-xl transition-all duration-200;
-  }
+@utility btn-primary {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.9), rgba(168, 85, 247, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3);
+  @apply text-white font-bold rounded-xl transition-all duration-200;
+}
 
-  .btn-primary:hover {
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.35), 0 0 60px rgba(168, 85, 247, 0.2), 0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px) scale(1.02);
-  }
+.btn-primary:hover {
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.35), 0 0 60px rgba(168, 85, 247, 0.2), 0 8px 25px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
 
-  .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative;
-    color: rgba(255, 255, 255, 0.55);
-  }
+@utility sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative;
+  color: rgba(255, 255, 255, 0.55);
+}
 
-  .sidebar-link:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.9);
-  }
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}
 
-  .sidebar-link.active {
-    background: rgba(0, 212, 255, 0.1);
-    color: #00d4ff;
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.08);
-  }
+.sidebar-link.active {
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.08);
+}
 
-  .input-field {
-    @apply w-full rounded-xl py-3 px-4 text-sm font-medium outline-none transition-all duration-200;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-  }
+@utility input-field {
+  @apply w-full rounded-xl py-3 px-4 text-sm font-medium outline-none transition-all duration-200;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
 
-  .input-field:focus {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(0, 212, 255, 0.5);
-    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08);
-  }
+.input-field:focus {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08);
+}
 
-  .input-field::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-  }
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
 
-  .stat-card {
-    @apply glass-card p-6 relative overflow-hidden cursor-default;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+@utility stat-card {
+  background: rgba(10, 15, 40, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .stat-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    border-color: rgba(0, 212, 255, 0.3);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 212, 255, 0.1);
-  }
+.stat-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 212, 255, 0.1);
 }
 
 /* =========================================
