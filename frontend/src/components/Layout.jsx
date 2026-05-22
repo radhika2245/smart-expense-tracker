@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, CreditCard, Sparkles, Settings,
     Bell, Search, Plus, ChevronDown, User,
@@ -138,6 +138,20 @@ const navLinks = [
 ];
 
 function Sidebar({ location }) {
+    const navigate = useNavigate();
+
+    const userInfoString = localStorage.getItem('userInfo');
+    const user = userInfoString ? JSON.parse(userInfoString) : null;
+    const userName = user?.name || 'Guest User';
+    const userEmail = user?.email || 'guest@example.com';
+    const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        navigate('/login');
+    };
+
     return (
         <motion.aside
             initial={{ x: -280 }}
@@ -191,24 +205,24 @@ function Sidebar({ location }) {
 
             {/* Bottom user info */}
             <div className="mt-auto pt-6 border-t border-white/[0.06]">
-                <div className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-all cursor-pointer group">
+                <div onClick={handleLogout} className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-all cursor-pointer group">
                     <div className="relative">
                         <div className="w-9 h-9 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #00d4ff, #a855f7)' }}>
                             <img
-                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=AIFlow&backgroundColor=transparent"
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}&backgroundColor=transparent`}
                                 alt="User avatar"
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
-                                    e.currentTarget.parentElement.innerHTML = '<span class="text-white font-bold text-sm flex items-center justify-center w-full h-full">AK</span>';
+                                    e.currentTarget.parentElement.innerHTML = `<span class="text-white font-bold text-sm flex items-center justify-center w-full h-full">${initials}</span>`;
                                 }}
                             />
                         </div>
                         <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-brand-darker rounded-full" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate text-white group-hover:text-brand-cyan transition-colors">Ankit Kumar</p>
-                        <p className="text-[11px] text-white/40 truncate">ankit@aiflow.io</p>
+                        <p className="text-sm font-semibold truncate text-white group-hover:text-brand-cyan transition-colors">{userName}</p>
+                        <p className="text-[11px] text-white/40 truncate">{userEmail}</p>
                     </div>
                     <LogOut className="w-4 h-4 text-white/30 group-hover:text-rose-400 transition-colors flex-shrink-0" />
                 </div>
@@ -222,6 +236,19 @@ function Topbar({ onAddRecord, location }) {
     const [showNotif, setShowNotif] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
+    const navigate = useNavigate();
+
+    const userInfoString = localStorage.getItem('userInfo');
+    const user = userInfoString ? JSON.parse(userInfoString) : null;
+    const userName = user?.name || 'Guest User';
+    const userEmail = user?.email || 'guest@example.com';
+    const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        navigate('/login');
+    };
 
     const pageTitle = {
         '/dashboard': 'Overview',
@@ -318,14 +345,14 @@ function Topbar({ onAddRecord, location }) {
                     >
                         <div className="relative w-7 h-7 rounded-lg overflow-hidden ring-1 ring-brand-cyan/30" style={{ background: 'linear-gradient(135deg, #00d4ff, #a855f7)' }}>
                             <img
-                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=AIFlow&backgroundColor=transparent"
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}&backgroundColor=transparent`}
                                 alt="Profile"
                                 className="w-full h-full object-cover"
                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
                             />
-                            <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs">AK</span>
+                            <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs">{initials}</span>
                         </div>
-                        <span className="text-sm font-medium text-white/80 hidden sm:block">Ankit</span>
+                        <span className="text-sm font-medium text-white/80 hidden sm:block">{userName.split(' ')[0]}</span>
                         <ChevronDown className={`w-3.5 h-3.5 text-white/40 transition-transform ${showProfile ? 'rotate-180' : ''}`} />
                     </motion.button>
 
@@ -339,10 +366,10 @@ function Topbar({ onAddRecord, location }) {
                             >
                                 <div className="px-4 py-3 border-b border-white/[0.06]">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-white font-bold" style={{ background: 'linear-gradient(135deg, #00d4ff, #a855f7)' }}>AK</div>
+                                        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-white font-bold" style={{ background: 'linear-gradient(135deg, #00d4ff, #a855f7)' }}>{initials}</div>
                                         <div>
-                                            <p className="font-semibold text-sm">Ankit Kumar</p>
-                                            <p className="text-xs text-white/40">ankit@aiflow.io</p>
+                                            <p className="font-semibold text-sm">{userName}</p>
+                                            <p className="text-xs text-white/40">{userEmail}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -358,7 +385,7 @@ function Topbar({ onAddRecord, location }) {
                                     </motion.button>
                                 ))}
                                 <div className="border-t border-white/[0.06] mt-1 pt-1">
-                                    <motion.button whileHover={{ backgroundColor: 'rgba(244,63,94,0.08)', x: 4 }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:text-rose-300 transition-colors">
+                                    <motion.button onClick={handleLogout} whileHover={{ backgroundColor: 'rgba(244,63,94,0.08)', x: 4 }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:text-rose-300 transition-colors">
                                         <LogOut className="w-4 h-4" />
                                         Sign Out
                                     </motion.button>

@@ -1,18 +1,40 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
-import { ArrowLeft, Mail, Lock, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FloatShapes from '../components/3d/FloatShapes';
+import api from '../utils/api';
 
 export default function Login() {
     const [isLogin, setIsLogin] = useState(true);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleAuth = (e) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
-        // Quick mock auth flow for presentation
-        navigate('/dashboard');
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            const endpoint = isLogin ? '/auth/login' : '/auth/register';
+            const payload = isLogin ? { email, password } : { name, email, password };
+
+            const { data } = await api.post(endpoint, payload);
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userInfo', JSON.stringify(data));
+
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Authentication failed. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -51,6 +73,12 @@ export default function Login() {
                         </p>
                     </div>
 
+                    {error && (
+                        <div className="mb-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl text-sm font-medium">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleAuth} className="space-y-4">
                         <AnimatePresence mode="popLayout">
                             {!isLogin && (
@@ -65,6 +93,9 @@ export default function Login() {
                                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                                         <input
                                             type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            required={!isLogin}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-brand-cyan transition-colors"
                                             placeholder="John Doe"
                                         />
@@ -79,6 +110,9 @@ export default function Login() {
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                                 <input
                                     type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-brand-cyan transition-colors"
                                     placeholder="you@example.com"
                                 />
@@ -91,6 +125,9 @@ export default function Login() {
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                                 <input
                                     type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-brand-cyan transition-colors"
                                     placeholder="••••••••"
                                 />
@@ -98,11 +135,13 @@ export default function Login() {
                         </div>
 
                         <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full py-3.5 rounded-xl bg-white text-brand-darker font-bold text-lg hover:bg-white/90 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)] mt-4"
+                            whileHover={!isLoading ? { scale: 1.02 } : {}}
+                            whileTap={!isLoading ? { scale: 0.98 } : {}}
+                            disabled={isLoading}
+                            className="w-full py-3.5 rounded-xl bg-white text-brand-darker font-bold text-lg hover:bg-white/90 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)] mt-4 flex justify-center items-center gap-2 disabled:opacity-70"
                             type="submit"
                         >
+                            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
                             {isLogin ? 'Sign In' : 'Create Account'}
                         </motion.button>
                     </form>

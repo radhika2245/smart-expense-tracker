@@ -1,21 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Plus, Filter, ArrowRight, Tag, Check, Loader2,
-    Download, ChevronDown, ArrowUpRight, ArrowDownRight
+    Download, ChevronDown, ArrowUpRight, ArrowDownRight, Trash2
 } from 'lucide-react';
+import api from '../utils/api';
 
 const CATEGORIES = ['All', 'Electronics', 'Groceries', 'Food & Beverage', 'Entertainment', 'Transport', 'Health', 'Shopping', 'Salary'];
-const INITIAL_EXPENSES = [
-    { id: 1, name: 'iQOO Neo 9', cat: 'Electronics', date: 'May 17, 2026', amt: 40999.00, type: 'expense', status: 'Completed' },
-    { id: 2, name: 'Big Bazaar', cat: 'Groceries', date: 'May 16, 2026', amt: 2150.00, type: 'expense', status: 'Completed' },
-    { id: 3, name: 'Netflix India', cat: 'Entertainment', date: 'May 15, 2026', amt: 649.00, type: 'expense', status: 'Recurring' },
-    { id: 4, name: 'Salary Credit', cat: 'Salary', date: 'May 15, 2026', amt: 85000.00, type: 'income', status: 'Completed' },
-    { id: 5, name: 'Ola Cab', cat: 'Transport', date: 'May 13, 2026', amt: 320.00, type: 'expense', status: 'Completed' },
-    { id: 6, name: 'Starbucks', cat: 'Food & Beverage', date: 'May 12, 2026', amt: 480.00, type: 'expense', status: 'Completed' },
-    { id: 7, name: 'Cult Fit', cat: 'Health', date: 'May 10, 2026', amt: 1999.00, type: 'expense', status: 'Recurring' },
-    { id: 8, name: 'Amazon India', cat: 'Shopping', date: 'May 9, 2026', amt: 5499.00, type: 'expense', status: 'Completed' },
-];
+const INITIAL_EXPENSES = [];
 
 // Cat color mapping
 const catColors = {
@@ -36,10 +28,35 @@ export default function Expenses() {
     const [expenses, setExpenses] = useState(INITIAL_EXPENSES);
     const [showQuickAdd, setShowQuickAdd] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [catFilter, setCatFilter] = useState('All');
     const [search, setSearch] = useState('');
     const [form, setForm] = useState({ title: '', amount: '', cat: 'Groceries' });
+
+    useEffect(() => {
+        fetchExpenses();
+    }, []);
+
+    const fetchExpenses = async () => {
+        try {
+            const { data } = await api.get('/expenses');
+            const mapped = data.map(exp => ({
+                id: exp._id,
+                name: exp.title,
+                cat: exp.category,
+                date: new Date(exp.date || exp.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                amt: exp.amount,
+                type: 'expense', // Backend treats them as expenses naturally here
+                status: exp.isSubscription ? 'Recurring' : 'Completed'
+            }));
+            setExpenses(mapped);
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Failed to fetch expenses', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const showToast = (msg, type = 'success') => {
         setToast({ msg, type });
@@ -51,23 +68,47 @@ export default function Expenses() {
         if (!form.title.trim() || !form.amount) return showToast('Please fill all required fields', 'error');
 
         setIsSubmitting(true);
-        await new Promise(r => setTimeout(r, 700));
 
-        const newExp = {
-            id: Date.now(),
-            name: form.title,
-            cat: form.cat,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            amt: parseFloat(form.amount),
-            type: 'expense',
-            status: 'Completed',
-        };
+        try {
+            const payload = {
+                title: form.title,
+                amount: parseFloat(form.amount),
+                category: form.cat,
+                date: new Date(),
+                isSubscription: false
+            };
+            const { data } = await api.post('/expenses', payload);
 
-        setExpenses(prev => [newExp, ...prev]);
-        setIsSubmitting(false);
-        setForm({ title: '', amount: '', cat: 'Groceries' });
-        setShowQuickAdd(false);
-        showToast(`✅ "${newExp.name}" added successfully!`);
+            const newExp = {
+                id: data._id,
+                name: data.title,
+                cat: data.category,
+                date: new Date(data.date || data.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                amt: data.amount,
+                type: 'expense',
+                status: data.isSubscription ? 'Recurring' : 'Completed',
+            };
+
+            setExpenses(prev => [newExp, ...prev]);
+            setForm({ title: '', amount: '', cat: 'Groceries' });
+            setShowQuickAdd(false);
+            showToast(`✅ "${newExp.name}" added successfully!`);
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Failed to add expense', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleDelete = async (e, id) => {
+        e.stopPropagation();
+        try {
+            await api.delete(`/expenses/${id}`);
+            setExpenses(prev => prev.filter(exp => exp.id !== id));
+            showToast('Expense deleted successfully');
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Failed to delete expense', 'error');
+        }
     };
 
     const filtered = expenses.filter(e => {
@@ -223,11 +264,19 @@ export default function Expenses() {
                                 <th className="py-4 px-6 text-xs font-semibold text-white/35 uppercase tracking-wider">Status</th>
                                 <th className="py-4 px-6 text-xs font-semibold text-white/35 uppercase tracking-wider">Date</th>
                                 <th className="py-4 px-6 text-xs font-semibold text-white/35 uppercase tracking-wider text-right">Amount</th>
+                                <th className="py-4 px-6 text-xs font-semibold text-white/35 uppercase tracking-wider text-right"></th>
                             </tr>
                         </thead>
                         <motion.tbody initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.04 } } }}>
                             <AnimatePresence>
-                                {filtered.map((tx) => {
+                                {isLoading ? (
+                                    <motion.tr>
+                                        <td colSpan="6" className="py-16 text-center">
+                                            <Loader2 className="w-8 h-8 animate-spin text-brand-cyan mx-auto mb-4" />
+                                            <p className="text-white/40 text-sm">Loading expenses...</p>
+                                        </td>
+                                    </motion.tr>
+                                ) : filtered.map((tx) => {
                                     const colors = catColors[tx.cat] || catColors.default;
                                     return (
                                         <motion.tr
@@ -263,6 +312,15 @@ export default function Expenses() {
                                             <td className={`py-4 px-6 text-right font-bold text-base ${tx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
                                                 {tx.type === 'income' ? '+' : '-'}₹{tx.amt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                             </td>
+                                            <td className="py-4 px-6 text-right">
+                                                <button
+                                                    onClick={(e) => handleDelete(e, tx.id)}
+                                                    className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                                    title="Delete Expense"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </td>
                                         </motion.tr>
                                     );
                                 })}
@@ -270,10 +328,10 @@ export default function Expenses() {
                         </motion.tbody>
                     </table>
 
-                    {filtered.length === 0 && (
+                    {filtered.length === 0 && !isLoading && (
                         <div className="py-16 text-center">
                             <p className="text-white/25 text-lg font-bold">No transactions found</p>
-                            <p className="text-white/15 text-sm mt-1">Try adjusting your filters</p>
+                            <p className="text-white/15 text-sm mt-1">Try adjusting your filters or add a new expense</p>
                         </div>
                     )}
                 </div>
